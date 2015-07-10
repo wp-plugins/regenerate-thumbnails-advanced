@@ -1,0 +1,25 @@
+/*Progress bar style*/
+#rta .ui-progressbar{
+    position:relative;
+}
+#rta .ui-progressbar .ui-progressbar-value.ui-widget-header{
+    background-color: #34e749;
+    position:relative;
+}
+#rta .ui-progressbar .progress-label {
+    position: absolute;
+    left: 50%;
+    top: 4px;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #fff;
+    z-index: 10;
+}
+/*information section*/
+#rta .info{
+    padding:20px 0;
+    line-height: 24px;
+}
+#rta .info span{
+    font-weight: bold;
+    font-size: 18px;
+}
