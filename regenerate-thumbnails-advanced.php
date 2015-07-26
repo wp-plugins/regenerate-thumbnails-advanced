@@ -1,10 +1,9 @@
 <?php
-
 /*
   Plugin Name: reGenerate Thumbnails - advanced
   Plugin URI: http://turcuciprian.com
   Description: A plugin that makes regenerating thumbnails even easier than before and more flexible.
-  Version: 0.7
+  Version: 0.8
   Author: turcuciprian
   Author URI: http://turcuciprian.com
   License: GPLv2 or later
@@ -13,7 +12,7 @@
 
 //Global variables for arguments
 
-class cc {
+class cc { 
 
 //    create basic page in the admin panel, with menu settings too
     public function start() {
@@ -22,8 +21,6 @@ class cc {
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin'));
         //ajax callback for button click
         add_action('wp_ajax_rta_ajax', array($this, 'ajax_callback'));
-        //ajax callback for returning general data (total)
-        add_action('wp_ajax_rta_rt_options', array($this, 'ajax_options_callback'));
     }
 
     public function ajax_callback() {
@@ -79,6 +76,7 @@ class cc {
                 echo json_encode($return_arr);
                 break;
             case 'submit':
+                $error = array();
                 if (isset($_POST['offset'])) {
                     $offset = $_POST['offset'];
                 }
@@ -93,7 +91,6 @@ class cc {
                         'orderby' => 'ID',
                         'order' => 'DESC'
                     );
-
                     switch ($period) {
                         case '0':
                             break;
@@ -117,9 +114,7 @@ class cc {
                                     'after' => $date,
                                 )
                         ));
-//                        print_r($date_arr);
                         $args = array_merge($args, $period_arr);
-//                        print_r($args);
                     }
                 }
 
@@ -137,26 +132,50 @@ class cc {
 
                         $the_query->the_post();
                         $image_id = $the_query->post->ID;
+                        $is_image = true;
                         $fullsizepath = get_attached_file($image_id);
-                        if (false === $fullsizepath || !file_exists($fullsizepath))
-                            echo '<code>' . esc_html($fullsizepath) . '</code>';
-
-                        @set_time_limit(900);
-                        $metadata = wp_generate_attachment_metadata($image_id, $fullsizepath);
-                        if (is_wp_error($metadata)) {
-                            echo $metadata->get_error_message();
+                        //is image:
+                        if(!is_array(getimagesize($fullsizepath))){
+                            $is_image = false;
+                            
                         }
-                        if (empty($metadata)) {
-//                            $this->die_json_error_msg($image_id, __('Unknown failure reason.', 'regenerate-thumbnails'));
-                            echo 'Unknown failure reason. regenerate-thumbnails ' . $image_id . '';
+                        if($is_image){
+                            if (false === $fullsizepath || !file_exists($fullsizepath))
+                                $error[] = '<code>' . esc_html($fullsizepath) . '</code>'; 
+    
+                            @set_time_limit(900);
+                            $metadata = wp_generate_attachment_metadata($image_id, $fullsizepath);
+                            //get the attachment name
+                            $filename_only = basename( get_attached_file( $image_id ) );
+                            if (is_wp_error($metadata)) {
+                                $error[] = sprint_f("%s Image ID:%d",$metadata->get_error_message(),$image_id);
+                            }
+                            if (empty($metadata)) {
+                                //$this->die_json_error_msg($image_id, __('Unknown failure reason.', 'regenerate-thumbnails'));
+                            $error[] = sprint_f('Unknown failure reason. regenerate-thumbnails %d', $image_id);
+                            
+                            }else{
+                                wp_update_attachment_metadata($image_id, $metadata);
+                            }
+                        }else{
+                            $filename_only = basename( get_attached_file( $image_id ) );
+                            
+                            $error[]=sprintf('Attachment (<b>%s</b> - ID:%d) is not an image. Skipping',$filename_only,$image_id);
                         }
-                        wp_update_attachment_metadata($image_id, $metadata);
                     }
+                    
                 } else {
-                    echo "empty?";
+                    $error[] = "No pictures uploaded";
+                }
+                
+                
+                //
+                if (!extension_loaded('gd') && !function_exists('gd_info')) {
+                   $error[]= "<b>PHP GD library is not installed</b> on your web server. Please install in order to have the ability to resize and crop images";
                 }
                 //increment offset
-                echo $offset + 1;
+                $result = $offset + 1;
+                echo json_encode(array('offset'=>($offset+1),'error'=>$error));
                 break;
         }
         /* Restore original Post Data */
@@ -164,13 +183,6 @@ class cc {
 
         wp_die();
     }
-
-    //ajax request to return total nr of images for the main script to use when button is clicked
-    public function ajax_options_callback() {
-        echo "???";
-        wp_die();
-    }
-
 //    Admin menu calback
     public function create_menu() {
         global $cc_args;
@@ -187,7 +199,7 @@ class cc {
             }
         }
         wp_enqueue_script('jquery-ui-progressbar');
-        wp_enqueue_style('rta-jquery-ui', plugin_dir_url(__FILE__) . 'jquery-ui.css');
+        wp_enqueue_style('rta-jquery-ui', plugin_dir_url(__FILE__) . 'jquery-ui.min.css');
         wp_enqueue_style('rta', plugin_dir_url(__FILE__) . 'style.css');
         wp_enqueue_script('rta', plugin_dir_url(__FILE__) . 'script.js');
     }
@@ -222,6 +234,10 @@ class cc {
         $content .= sprintf('</select>');
         $content .= sprintf('<p class="submit">'
                 . '<button class="button button-primary RTA">Regenerate Thumbnails</button>'
+                . '<h3>Errors</h3>'
+                . '<div class="errors ui-widget-content">'
+                . 'No errors to display yet.'
+                . '</div>'//where the errors show
                 . '</p>');
 
         $content .= sprintf('</div>'
