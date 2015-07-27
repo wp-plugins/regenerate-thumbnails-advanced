@@ -3,8 +3,8 @@ Contributors: turcuciprian
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MU4RJNNF74QKY
 Tags: regenerate, thumbnails, advanced, easy, day, weeek, month
 Requires at least: 4.0
-Tested up to: 4.2.2
-Stable tag: 4.2.2
+Tested up to: 4.2.3
+Stable tag: 0.8.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,7 +52,22 @@ The script stops, it does not run in the background
 = 0.7 =
 * The first upload of the plugin
 
+= 0.8 =
+*Shows errors
+*GD library error missing library present
+*added jquery ui images for
+*added jquery ui min css file
+*removed the incrementation of processed images if there are none (it was showing one was being processed when it wasn't)
+
+= 0.8.1 =
+*images did not get added in the previous version. Neither did the css file for jquery ui
 == Upgrade Notice ==
 
 = 0.7 =
 No issues have been detected since this is the first version that's out there. Please report any issues
+
+= 0.8 =
+No issuse with this version that require attention
+
+= 0.8.1 =
+This is a very minor change . Practically fixing the previous change incomplete commit
