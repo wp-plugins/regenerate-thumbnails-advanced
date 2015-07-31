@@ -2,7 +2,7 @@
 Contributors: turcuciprian
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MU4RJNNF74QKY
 Tags: regenerate, thumbnails, advanced, easy, day, weeek, month
-Requires at least: 4.0
+Requires at least: 4.0 
 Tested up to: 4.2.3
 Stable tag: 0.8.1
 License: GPLv2 or later
@@ -61,6 +61,10 @@ The script stops, it does not run in the background
 
 = 0.8.1 =
 *images did not get added in the previous version. Neither did the css file for jquery ui
+
+= 0.8.2 =
+*log section showing what's been processed (image name)
+
 == Upgrade Notice ==
 
 = 0.7 =
@@ -71,3 +75,6 @@ No issuse with this version that require attention
 
 = 0.8.1 =
 This is a very minor change . Practically fixing the previous change incomplete commit
+
+= 0.8.2 =
+No issuse with this version that require attention
