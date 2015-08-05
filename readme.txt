@@ -46,6 +46,7 @@ The script stops, it does not run in the background
 == Screenshots ==
 
 1. The plugin page where it all happens
+2. View of the dropdown options
 
 == Changelog ==
 
