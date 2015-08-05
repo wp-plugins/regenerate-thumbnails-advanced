@@ -3,7 +3,7 @@
   Plugin Name: reGenerate Thumbnails - advanced
   Plugin URI: http://turcuciprian.com
   Description: A plugin that makes regenerating thumbnails even easier than before and more flexible.
-  Version: 0.8.1
+  Version: 0.8.2
   Author: turcuciprian
   Author URI: http://turcuciprian.com
   License: GPLv2 or later
@@ -33,7 +33,7 @@ class cc {
                 $args = array(
                     'post_type' => 'attachment',
                     'posts_per_page' => -1,
-                    'post_status' => 'any',
+                    'post_status' => 'any', 
                     'offset' => 0
                 );
 
@@ -76,6 +76,7 @@ class cc {
                 echo json_encode($return_arr);
                 break;
             case 'submit':
+                $logstatus='';
                 $error = array();
                 if (isset($_POST['offset'])) {
                     $offset = $_POST['offset'];
@@ -157,6 +158,7 @@ class cc {
                             }else{
                                 wp_update_attachment_metadata($image_id, $metadata);
                             }
+                            $logstatus = "<br/>".$filename_only." - <b>Processed</b>";
                         }else{
                             $filename_only = basename( get_attached_file( $image_id ) );
                             
@@ -175,7 +177,7 @@ class cc {
                 }
                 //increment offset
                 $result = $offset + 1;
-                echo json_encode(array('offset'=>($offset+1),'error'=>$error));
+                echo json_encode(array('offset'=>($offset+1),'error'=>$error,'logstatus'=>$logstatus));
                 break;
         }
         /* Restore original Post Data */
@@ -234,7 +236,10 @@ class cc {
         $content .= sprintf('</select>');
         $content .= sprintf('<p class="submit">'
                 . '<button class="button button-primary RTA">Regenerate Thumbnails</button>'
-                . '<h3>Errors</h3>'
+                . '<h3>Progress & Errors</h3>'
+                . '<div class="logstatus ui-widget-content">'
+                . 'Nothing processed yet'
+                . '</div>'//where the errors show
                 . '<div class="errors ui-widget-content">'
                 . 'No errors to display yet.'
                 . '</div>'//where the errors show
